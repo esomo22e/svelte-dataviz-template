@@ -40,7 +40,7 @@ You can run the newly built app with `npm run start`. This uses [sirv](https://g
 
 1. Run the `build` command as seen above.
 
-2. Upload the contents of the /public/ folder to Cyberduck.
+2. Upload the contents of the /public/ folder to the FTP server.
 
 3. Open the `index.html` file of that folder in a text editor.
 
@@ -95,7 +95,7 @@ Can be used to create bar charts either vertically or horizontally.
 
 ### Mapbox
 
-tk
+In theory this will let you put a map into this template, powered by Mapbox. Haven't yet built in anyway to pass in some kind of data layer or visualization for it, though. For Mapbox projects it may be a better idea to build off the `winter-hangout-places` or `campus-construction-2020` repositories in Github.
 
 
 ### MapUSA
@@ -123,6 +123,7 @@ This generates a chloropleth style map of the US, using D3. The GeoJSON files it
 
 ### WaffleChart
 
+This is a way of building an SVG-type waffle chart using D3; however, I don't think it makes very much sense, and it's probably a better idea to use the no-D3-needed methods used in the `bball-coen-wins` repo.
 
 
 ### XYHeatmap

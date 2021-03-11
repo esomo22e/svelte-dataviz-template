@@ -125,8 +125,21 @@ This generates a chloropleth style map of the US, using D3. The GeoJSON files it
 
 
 
+### XYHeatmap
+
+- data: pass the dataset.
+- width: chart width.
+- height: chart height.
+- xVar: the dependent variable's key in the dataset, typically the dates whose data you're visualizing.
+- yGroups: the key of the variable you want to show as a line on the chart. If you pass an array of strings, you'll get multiple rows in the heatmap; one for each yGroup specified here.
+- yDomain: the range of the independent variable, basically the minimum and maximum values you'll have.
+- colorscheme: which array of color codes you'd like to use. Pass a custom array of hex codes if you'd like, or pick one of the ones established in the colors file in /helpers/. In a "heatmap" type chart like this, you'll want something that works well in a linear scale. Defaults to `divergingbrownteal`.
+
+
+
 
 ## "Helpers" folder
+
 
 - colors.js: several arrays of hex codes that can be used as color scales. Meant to be colorblindness-friendly and at least partially based on brand colors.
 

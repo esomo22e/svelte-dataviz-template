@@ -128,9 +128,9 @@ This generates a chloropleth style map of the US, using D3. The GeoJSON files it
 
 ## "Helpers" folder
 
-- colors.js: several arrays of hex codes that can be used as color scales.
+- colors.js: several arrays of hex codes that can be used as color scales. Meant to be colorblindness-friendly and at least partially based on brand colors.
 
-- join.js: a function that can be imported to join two different dataset files together, as long as the items have a key value in common.
+- join.js: a function that can be imported to join two different dataset files together, as long as the items have a key value in common. This is based on [this example which may explain it better than I could](http://learnjsdata.com/combine_data.html).
 
 - USAGeoAlbers.js: a GeoJSON file for a USA state map
 
@@ -138,4 +138,4 @@ This generates a chloropleth style map of the US, using D3. The GeoJSON files it
 
 - USStates.js: a list of US states and their common two-letter abbreviations.
 
-- wrapLabel.js: a function to wrap long axis labels in D3 charts to multiple lines, similar to (this pattern)[https://bl.ocks.org/mbostock/7555321].
+- wrapLabel.js: a function to wrap long axis labels in D3 charts to multiple lines, similar to [this pattern](https://bl.ocks.org/mbostock/7555321).

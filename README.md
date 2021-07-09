@@ -9,9 +9,8 @@ This is a project template for [Svelte](https://svelte.dev) apps. It lives at ht
 ## Get started
 
 Install the dependencies...
-
+(make sure you are using node: '>=12')
 ```bash
-cd svelte-app
 npm install
 ```
 

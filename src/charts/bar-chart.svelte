@@ -6,6 +6,11 @@
 	import { select } from 'd3-selection';
 	import { vibrant } from '../helpers/colors.js'
 	import { wrapLabel } from '../helpers/wrapLabel.js'
+	import {line, curveMonotoneX, curveNatural} from 'd3-shape';
+   import {path} from 'd3-path';
+   import {interpolateRound} from 'd3-interpolate';
+   import 'd3-transition'
+   // import {legendColor} from 'd3-svg-legend';
 
 	let d3 = {
 		scaleLinear: scaleLinear,
@@ -16,12 +21,16 @@
 		axisRight: axisRight,
 		axisBottom: axisBottom,
 		axisTop: axisTop,
-		format: format
+		format: format,
+		path: path,
+	 curveMonotoneX: curveMonotoneX,
+	 curveNatural: curveNatural,
+	 interpolateRound: interpolateRound
 	}
 
 	let el;
 
-	const padding = { top: 10, right: 0, bottom: 50, left: 50 };
+	const padding = { top: 10, right: 0, bottom: 50, left: 70 };
 
 
 
@@ -30,9 +39,26 @@
 	export let height = {height};
 	export let xVar = {xVar};
 	export let yVar = {yVar};
-	export let yDomain = ([0, 100])
+	export let yDomain = ([0, 16000000])
 	export let colorscheme = vibrant;
+	export let hasAccent = false;
 	export let orientation = "vertical";
+
+
+	let len = data.length;
+
+  let classNames = [
+	  "graph",
+	  "bar-graph"
+  ];
+
+  if (hasAccent) {
+	  classNames.push("has-accent");
+  }
+
+  const getClassNames = () => {
+         return classNames.join(" ");
+     }
 
 	if (Array.isArray(yVar)) {
 		yVar = yVar
@@ -51,7 +77,9 @@
 
 	$: colorScale = d3.scaleOrdinal()
 		.domain(data.map(function(o) { return o[xVar]; }))
-		.range(colorscheme);
+		.range(["var(--chart--color-primary)", "var(--chart--color-secondary)"])
+
+		// .range(colorscheme);
 
 	onMount(generateBarChart);
 
@@ -68,17 +96,21 @@
 		}
 
 		// draw chart SVG
-		var svg = d3.select(el)
+		let svg = d3.select(el)
 			.append("svg")
+			.attr("class", "graph-visual")
 			.attr("width", width)
 			.attr("height", height)
-			.append("g")
-			.attr("transform",
-				  "translate(" + padding.left + "," + padding.top + ")");
+
+
+		let plotWrapper = svg.append("g")
+					.attr("transform",
+						  "translate(" + padding.left + "," + padding.top + ")");
 
 		if (orientation !== "vertical") {
 			// axes
-			let axisLeft = svg.append("g")
+			let axisLeft = plotWrapper.append("g")
+            .attr("class", "axis axis--y")
 			   .call(d3.axisLeft(xScale)
 					.tickSizeInner(0)
 					.tickSizeOuter(0)
@@ -89,8 +121,15 @@
 			axisLeft.selectAll(".tick text")
 				.call(wrapLabel, padding.left);
 
-			let axisBottom = svg.append("g")
+			let axisBottom;
+
+			let xAxis = plotWrapper.append("g")
+			            .attr("class", "graph-plot")
 				.attr("transform", "translate(0," + (height-padding.bottom) + ")")
+				 .attr("class", "axis axis--x");
+
+				 let xAxisTicks = xAxis.append("g")
+		   .attr("class", "axis-ticks")
 	  			.call(d3.axisBottom(yScale)
 					.ticks(5)
 					.tickSizeInner(-width)
@@ -103,7 +142,7 @@
 			// add data points
 			let length = yVar.length
 			for (let v in yVar) {
-				svg.append('g')
+				plotWrapper.append("g")
 				    .selectAll("rect")
 				    .data(data)
 				    .enter()
@@ -132,7 +171,8 @@
 
 		} else {
 			// axes
-			let axisBottom = svg.append("g")
+			let axisBottom = plotWrapper.append("g")
+            // .attr("class", "axis axis--y")
 			   .attr("transform", "translate(0," + (height-padding.bottom) + ")")
 			   .call(d3.axisBottom(xScale)
 					.tickSizeInner(0)
@@ -146,7 +186,7 @@
 			axisBottom.selectAll(".tick text")
 				.call(wrapLabel, width/xScale.domain().length - 30)
 
-			svg.append("g")
+			plotWrapper.append("g")
 	  			.call(d3.axisLeft(yScale)
 					.ticks(5)
 					.tickSizeInner(-width)
@@ -159,7 +199,7 @@
 			// add data points
 			let length = yVar.length
 			for (let v in yVar) {
-				svg.append('g')
+				plotWrapper.append("g")
 				    .selectAll("rect")
 				    .data(data)
 				    .enter()

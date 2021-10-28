@@ -44,7 +44,7 @@
 	export let width = Math.min(
 
 		document.getElementById('svelte-app').getBoundingClientRect().width,
-		1000
+		1100
 	);
 
 	console.log(waffledata.default[0])
@@ -196,7 +196,21 @@ main{
 	xVar={"State"}
 	yVar={["2020 Early Votes"]}
 	yGroups={["2016 Total Votes","2020 Early Votes"]}
-	colorscheme={["red", "grey"]}
+	colorscheme={["var(--chart--color-primary)", "var(--chart--color-secondary)"]}
+	orientation={"vertical"}
+
+/>
+
+<StackedBar
+	width={width}
+	height={500}
+	data={testData.default}
+	xVar={"State"}
+	yVar={["2020 Early Votes"]}
+	yGroups={["2016 Total Votes","2020 Early Votes"]}
+	colorscheme={[ "grey", "red"]}
+	orientation={"horizontal"}
+
 />
 <GraphicTitle
    title={"Bar Chart"}
@@ -229,7 +243,15 @@ main{
 	yVar={"2020 Early Votes"}
 	yDomain={[0, 3500000]}
 />
-
+<LollipopChart
+	data={turnout.default.filter(d => (["Massachusetts", "Rhode Island", "Connecticut", "New Hampshire", "Maine", "Vermont"].indexOf(d["State"]) > -1))}
+	width={width}
+	height={height}
+	xVar={"State"}
+	yVar={"2020 Early Votes"}
+	yDomain={[0, 3500000]}
+	orientation={"horizontal"}
+/>
 
 
 <div class = "category-title">Correlation</div>

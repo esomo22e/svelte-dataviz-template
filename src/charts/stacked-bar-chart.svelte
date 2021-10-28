@@ -40,14 +40,16 @@ export let xVar = {xVar};
 export let yVar = {yVar};
 export let yGroups = {yGroups};
 export let colorscheme = {colorscheme};
+// export let yDomain = ([0, 20000000])
 export let colorsteps = yGroups.length;
 export let len = data.length;
+export let orientation = "vertical";
 
 // for (let k=0; k < (len-31); k++) {
 // 	data.shift()
 // }
 
-
+console.log(yVar);
 // data.forEach(function(d,i){
 // 	if (i > (avgdaycount-2)) {
 // 		let array = [];
@@ -65,7 +67,11 @@ $: xScale = d3.scaleBand()
 	.padding(0.1);
 
 $: yScale = d3.scaleLinear()
-	.domain([0, Math.max.apply(Math, data.map(function(o) { return o[yVar]; }))])
+	.domain([0, Math.max.apply(Math, data.map(function(o) {
+		console.log(o[yVar])
+		return o[yVar] + 2500;
+	}))])
+	// .domain(yDomain)
 	.range([height - padding.bottom, padding.top])
 	.nice();
 
@@ -95,7 +101,18 @@ onMount(generateColumnChart);
 
 function generateColumnChart() {
 
-	var tooltip = d3.select(el).append("div").attr("class", "tooltip");
+	// var tooltip = d3.select(el).append("div").attr("class", "tooltip");
+	if (orientation !== "vertical") {
+		padding.top = 0;
+		padding.left = 75;
+		padding.right = 15;
+		if (xVar === "protest") {
+			padding.left = 180
+		}
+		xScale.range([padding.top, height - padding.bottom ])
+		yScale.range([1, width - padding.left - padding.right])
+	}
+
 
 	var svg = d3.select(el)
 		.append("svg")
@@ -105,69 +122,164 @@ function generateColumnChart() {
 		.attr("transform",
 		"translate(" + padding.left + "," + 0 + ")");
 
-	let axisBottomRender = svg.append("g")
-		.attr("transform", "translate(0," + (height-padding.bottom) + ")")
-		.attr("class","horizontalAxis")
-		.call(d3.axisBottom(xScale)
-			 .tickSizeInner(0)
-			 .tickSizeOuter(0)
-			 .tickPadding(5)
-		 )
-		 .call(g => g.select(".domain").remove());
+		if (orientation !== "vertical") {
 
-	axisBottomRender.selectAll("path")
-		.attr("stroke", "#ccc");
-
-	axisBottomRender.selectAll("text")
-		.style("text-anchor", "end")
-		.attr("transform", ("rotate(-45)"))
-		.attr("dx", -3)
-		.attr("dy", 3.5)
+			let axisVerticalRender = svg.append("g")
+				.attr("class","verticalAxis")
+				.call(d3.axisLeft(xScale)
+				.tickSizeInner(0)
+				.tickSizeOuter(0)
+				.tickPadding(10)
 
 
-	let axisVerticalRender = svg.append("g")
-		.attr("class","verticalAxis")
-		.call(d3.axisLeft(yScale)
-			.ticks(5)
-			.tickSizeInner(-width)
-			.tickSizeOuter(0)
-			.tickPadding(3)
+				)
+				.call(g => g.select(".domain").remove());
 
-		)
-		.call(g => g.select(".domain").remove());
+			axisVerticalRender.selectAll("path")
+				.attr("stroke", "#ccc");
 
-	axisVerticalRender.selectAll("path")
-		.attr("stroke", "#ccc");
+				let axisBottomRender = svg.append("g")
+					.attr("transform", "translate(0," + (height-padding.bottom) + ")")
+					.attr("class","horizontalAxis")
+					.call(d3.axisBottom(yScale)
+					.ticks(10)
+					.tickSizeInner(-width)
+					.tickSizeOuter(0)
+					.tickPadding(3)
+					 )
+					 .call(g => g.select(".domain").remove());
 
-	// add data columns
-	for (let i=0; i<yGroups.length; i++) {
-		svg.append('g')
-			.selectAll("rect")
-			.data(data)
-			.enter()
-			.append("rect")
-			.attr("fill", colors(yGroups[i]))
-			.attr("x", function (d) { return xScale(d[xVar]); })
-			.attr("y", function (d) {
-				let barheight = 0;
-				for (let j=i; j>-1; j = j-1) {
-					barheight += d[yGroups[j]]
-				}
-				return yScale(barheight)
-			})
-			.attr("width", xScale.bandwidth())
-			.attr("height", function(d) {
-				return height - padding.bottom - yScale(d[yGroups[i]]);
-			})
-			// .on("mousemove", function(d){
-			// 	if (window.innerWidth > 600) {
-			// 		showTip(d, tooltip, d3.mouse(this))
-			// 	}
-			// })
-			// .on("mouseout", function(d){
-			// 	tooltip.style("display", "none")
-			// });
-	}
+				axisBottomRender.selectAll("path")
+					.attr("stroke", "#ccc");
+
+				// axisBottomRender.selectAll("text")
+				// 	.style("text-anchor", "end")
+				// 	.attr("transform", ("rotate(-45)"))
+				// 	.attr("dx", -3)
+				// 	.attr("dy", 3.5)
+
+					// add data columns
+					for (let i=0; i<yGroups.length; i++) {
+							console.log(yGroups[0])
+						svg.append('g')
+							.selectAll("rect")
+							.attr("class", "test-stacked")
+							.data(data)
+							.enter()
+							.append("rect")
+							.attr("fill", colors(yGroups[i]))
+							.attr("y", function (d) {
+
+								console.log(d[xVar])
+								 return xScale(d[xVar]);
+
+							 })
+							.attr("x", function (d) {
+								let barheight = 0;
+								for (let j=i; j>-1; j = j-1) {
+									console.log(j)
+									console.log(yGroups[j])
+									barheight += d[yGroups[j]]
+								}
+
+								console.log(yScale(barheight))
+								return yScale(0)
+								// return 0;
+							})
+
+			// 				   .attr('transform', 'rotate(90 0 0)')
+							.attr("height", xScale.bandwidth())
+							.attr("width", function(d) {
+								// let barheight = 0;
+								// for (let j=i; j>-1; j = j-1) {
+								// 	console.log(j)
+								// 	console.log(yGroups[j])
+								// 	barheight += d[yGroups[j]]
+								// }
+
+								return yScale(d[yGroups[i]]);
+							})
+							// .on("mousemove", function(d){
+							// 	if (window.innerWidth > 600) {
+							// 		showTip(d, tooltip, d3.mouse(this))
+							// 	}
+							// })
+							// .on("mouseout", function(d){
+							// 	tooltip.style("display", "none")
+							// });
+					}
+
+		}
+		else{
+
+			let axisBottomRender = svg.append("g")
+				.attr("transform", "translate(0," + (height-padding.bottom) + ")")
+				.attr("class","horizontalAxis")
+				.call(d3.axisBottom(xScale)
+					 .tickSizeInner(0)
+					 .tickSizeOuter(0)
+					 .tickPadding(5)
+				 )
+				 .call(g => g.select(".domain").remove());
+
+			axisBottomRender.selectAll("path")
+				.attr("stroke", "#ccc");
+
+			// axisBottomRender.selectAll("text")
+			// 	.style("text-anchor", "end")
+			// 	.attr("transform", ("rotate(-45)"))
+			// 	.attr("dx", -3)
+			// 	.attr("dy", 3.5)
+
+
+			let axisVerticalRender = svg.append("g")
+				.attr("class","verticalAxis")
+				.call(d3.axisLeft(yScale)
+					.ticks(10)
+					.tickSizeInner(-width)
+					.tickSizeOuter(0)
+					.tickPadding(3)
+
+				)
+				.call(g => g.select(".domain").remove());
+
+			axisVerticalRender.selectAll("path")
+				.attr("stroke", "#ccc");
+
+			// add data columns
+			for (let i=0; i<yGroups.length; i++) {
+				svg.append('g')
+					.selectAll("rect")
+					.data(data)
+					.enter()
+					.append("rect")
+					.attr("fill", colors(yGroups[i]))
+					.attr("x", function (d) { return xScale(d[xVar]); })
+					.attr("y", function (d) {
+						let barheight = 0;
+						for (let j=i; j>-1; j = j-1) {
+							barheight += d[yGroups[j]]
+						}
+						console.log(barheight)
+
+						return yScale(barheight)
+					})
+					.attr("width", xScale.bandwidth())
+					.attr("height", function(d) {
+						return height - padding.bottom - yScale(d[yGroups[i]]);
+					})
+					// .on("mousemove", function(d){
+					// 	if (window.innerWidth > 600) {
+					// 		showTip(d, tooltip, d3.mouse(this))
+					// 	}
+					// })
+					// .on("mouseout", function(d){
+					// 	tooltip.style("display", "none")
+					// });
+			}
+
+
+		}
 
 
 
@@ -207,7 +319,13 @@ function generateColumnChart() {
 	margin:0 auto;
 }
 
+svg.test-stacked{
 
+	/* rotate the entire image */
+      -webkit-transform: rotate(-90deg);
+      transform: rotate(-90deg);
+
+}
 </style>
 
 <div bind:this={el} class="chart"></div>

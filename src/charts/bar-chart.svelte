@@ -39,7 +39,7 @@
 	export let height = {height};
 	export let xVar = {xVar};
 	export let yVar = {yVar};
-	export let yDomain = ([0, 16000000])
+	export let yDomain = ([0, 1600])
 	export let colorscheme = vibrant;
 	export let hasAccent = false;
 	export let orientation = "vertical";
@@ -121,7 +121,6 @@
 			axisLeft.selectAll(".tick text")
 				.call(wrapLabel, padding.left);
 
-			let axisBottom;
 
 			let xAxis = plotWrapper.append("g")
 			            .attr("class", "graph-plot")

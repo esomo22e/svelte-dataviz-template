@@ -32,6 +32,8 @@
 	export let yVar = {yVar};
 	export let yDomain = ([0, 100])
 	export let colorscheme = vibrant;
+	export let orientation = "vertical";
+
 
 	if (Array.isArray(yVar)) {
 		yVar = yVar
@@ -55,18 +57,138 @@
 	onMount(generateChart);
 
 	function generateChart() {
+		if (orientation !== "vertical") {
+			padding.top = 0;
+			padding.left = 75;
+			padding.right = 15;
+			if (xVar === "protest") {
+				padding.left = 180
+			}
+			xScale.rangeRound([padding.top, height - padding.bottom])
+			yScale.range([0, width - padding.left - padding.right])
+		}
+
+
+
 		// draw chart SVG
 		var svg = d3.select(el)
 			.append("svg")
 			.attr("width", width)
 			.attr("height", height)
-			.append("g")
-			.attr("transform",
-				  "translate(" + padding.left + "," + padding.top + ")");
+			.append("g");
+			// .attr("transform",
+			// 	  "translate(" + padding.left + "," + padding.top + ")");
+
+				  let plotWrapper = svg.append("g")
+							  .attr("transform",
+									"translate(" + padding.left + "," + padding.top + ")");
+
+				  if (orientation !== "vertical") {
+					  let axisLeft = plotWrapper.append("g")
+						.attr("class", "axis axis--y")
+						 .call(d3.axisLeft(xScale)
+							  .tickSizeInner(0)
+							  .tickSizeOuter(0)
+							  .tickPadding(5)
+						  )
+						  .call(g => g.select(".domain").remove());
+
+					  axisLeft.selectAll(".tick text")
+						  .call(wrapLabel, padding.left);
+
+
+					  let xAxis = plotWrapper.append("g")
+								  .attr("class", "graph-plot")
+						  .attr("transform", "translate(0," + (height-padding.bottom) + ")")
+						   .attr("class", "axis axis--x");
+
+						   let xAxisTicks = xAxis.append("g")
+					 .attr("class", "axis-ticks")
+						  .call(d3.axisBottom(yScale)
+							  .ticks(5)
+							  .tickSizeInner(-width)
+							  .tickSizeOuter(0)
+							  .tickPadding(3)
+
+						  )
+						  .call(g => g.select(".domain").remove())
+
+						  // add data points
+						  let length = yVar.length
+	  					for (let v in yVar) {
+	  						let datapoint = svg.append('g')
+	  						    .selectAll("g")
+	  						    .data(data)
+	  						    .enter()
+	  						    .append("g");
+
+	  						datapoint.append("rect")
+	  							.attr("x", function (d) {
+	  								return padding.left;
+	  							 })
+	  						    .attr("y", function (d) {
+	  								 return xScale(d[xVar]) + ((xScale.bandwidth() / length) * v);
+
+	  							 })
+	  							 .attr("height",
+	  							 	xScale.bandwidth() / length
+	  							)
+	  							 .attr("width", function (d) {
+	  								 // return height - padding.bottom - yScale(d[yVar[v]]);
+	  								 return yScale(d[yVar[v]]);
+
+	  							 })
+	  							 .attr("fill", function(d){
+	  								 return colorScale(d[xVar]);
+	  							 });
+	  						//
+	  						datapoint.append("circle")
+	  							 .attr("r", 10)
+	  							 .attr("cx", function (d) {
+	  								 return padding.left+ yScale(d[yVar[v]]);
+
+	  							 })
+	  						    .attr("cy", function (d) {
+	  								 return xScale(d[xVar]) + (xScale.bandwidth() / 2);
+
+	  							 })
+	  							 .attr("width", function(d){
+	  								 return height - padding.bottom - yScale(d[yVar[v]]);
+
+	  							 }
+	  							)
+	  							 .attr("height", function (d) {
+	  								return  xScale.bandwidth() / length;
+
+	  							 })
+	  							 .attr("fill", function(d){
+	  								 return colorScale(d[xVar]);
+	  							 });
+							//
+	  						// datapoint.append("text")
+	  						// 	.text(function(d) {
+	  						// 		return format(d[yVar[v]]);
+	  						// 	})
+	  						// 	.attr("fill", "black")
+	  						// 	.attr("text-anchor", "middle")
+	  						// 	.attr("x", function (d) {
+	  						// 		return yScale(d[yVar[v]]) + 40;
+							//
+	  						// 	})
+	  						// 	.attr("y", function (d) {
+	  						// 		return xScale(d[xVar]) + (xScale.bandwidth() / 2);
+							//
+	  						// 	})
+	  						// 	.attr("class", "datalabel")
+	  					}
+
+
+			  	}
+			  	else{
 
 
 		// axes
-		let axisBottom = svg.append("g")
+		let axisBottom = plotWrapper.append("g")
 		   .attr("transform", "translate(0," + (height-padding.bottom) + ")")
 		   .call(d3.axisBottom(xScale)
 				.tickSizeInner(0)
@@ -85,7 +207,7 @@
 				.call(wrapLabel, 100);
 		}
 
-		svg.append("g")
+			plotWrapper.append("g")
   			.call(d3.axisLeft(yScale)
 				.ticks(10)
 				.tickSizeInner(-width)
@@ -100,7 +222,7 @@
 			// add data points
 			let length = yVar.length
 			for (let v in yVar) {
-				let datapoint = svg.append('g')
+				let datapoint = plotWrapper.append("g")
 				    .selectAll("g")
 				    .data(data)
 				    .enter()
@@ -156,6 +278,8 @@
 					.attr("class", "datalabel")
 			}
 
+				}
+
 	} // generateChart
 </script>
 
@@ -168,6 +292,7 @@
 		fill: #fff;
 		font-family:"akkurat",Arial,sans-serif;
 		letter-spacing:-0.05rem;
+		font-size: 14px;;
 	}
 </style>
 
